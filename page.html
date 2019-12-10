@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>QR Host</title>
+		<link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+		<style type="text/css">
+			* {
+				margin: 0; padding: 0;
+				transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+			}
+
+			body {
+				margin: 50px;
+				font-family: "Roboto", sans-serif;
+				color: #000;
+				background: #fff;
+			}
+
+			a, a:link, a:visited, a:active, a:hover {
+				text-decoration: inherit;
+				color: inherit;
+			}
+
+			#files {
+				display: inline-block;
+				background: #E91E63;
+				color: #fff;
+				border-radius: 16px;
+			}
+
+			#files a {
+				display: block;
+				padding: 10px 15px;
+			}
+
+			#files a:nth-child(even) {
+				background-color: rgba(0,0,0,0.15);
+			}
+
+			#files a:hover {
+				padding-left: 20px;
+				font-weight: 700;
+			}
+
+			#qr-popup {
+				position: fixed; margin: auto;
+				top: 0; left: 0; right: 0; bottom: 0;
+				background: rgba(29,31,33,0.8);
+				width: 100%; height: 100%;
+				display: table;
+				color: #fff;
+			}
+
+			#qr-popup>div {
+				display: table-cell;
+				vertical-align: middle;
+				text-align: center;
+			}
+
+			#qr-popup p {
+				font-size: 1em;
+				margin-top: 16px;
+			}
+
+			#qr-popup img {
+				border-radius: 16px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Available files to download</h2>
+		<br>
+		<div id="files"></div>
+		<script src="qrcode.js"></script>
+		<script type="text/javascript">
+			var files = [files];
+			var filesEl = document.getElementById("files");
+
+			function showQRcode(url) {
+				let popup = document.createElement("div");
+				popup.id = "qr-popup";
+				popup.style.opacity = "0";
+				popup.addEventListener("click", e=>{
+					if (e.target!=content) return;
+					popup.style.opacity = "0";
+					setTimeout(()=>{
+						popup.remove();
+					}, 200);
+				});
+
+				let content = document.createElement("div");
+				popup.appendChild(content);
+
+				let qr = qrcode(8, "L");
+				qr.addData(url);
+				qr.make();
+				let image = qr.createImgTag(8, 16);
+				content.innerHTML = image+"<p>"+url+"</p>";
+
+				document.body.appendChild(popup);
+				setTimeout(()=>{
+					popup.style.opacity = "1";
+				}, 100);
+			}
+
+			files.forEach(file=>{
+				let fileEl = document.createElement("a");
+				fileEl.textContent = file;
+				fileEl.href = "javascript:";
+				fileEl.addEventListener("click", e=>{
+					showQRcode(encodeURI(window.location.origin+"/"+file));
+				});
+
+				filesEl.appendChild(fileEl);
+			});
+		</script>
+	</body>
+</html>
